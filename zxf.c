@@ -26,7 +26,7 @@
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "php_zxf.h"
-
+#include "zend_smart_str.h"
 ZEND_DECLARE_MODULE_GLOBALS(zxf)
 
 
@@ -163,7 +163,19 @@ PHP_FUNCTION(zxf_test)
  	RETURN_ARR(Z_ARR_P(z));
 }
 
-
+/* {{{zxf_smart_str
+*/
+PHP_FUNCTION(zxf_smart_str)
+{
+	smart_str buf = {0};
+	zend_string *ret;
+	smart_str_appendl(&buf, "zhaoxianqiang", strlen("zhaoxianqiang"));
+    
+    //printf("%s\n", buf.s->val);
+    ret = zend_string_init(buf.s->val, buf.a, 0);
+    smart_str_free(&buf);
+ 	RETURN_STR(ret);
+}
 /* {{{ php_zxf_init_globals
  */
 /* Uncomment this function if you have INI entries
@@ -240,6 +252,7 @@ const zend_function_entry zxf_functions[] = {
 	PHP_FE(zxf_get_type, NULL)
 	PHP_FE(zxf_get_arr, NULL)
 	PHP_FE(zxf_test, NULL)
+	PHP_FE(zxf_smart_str, NULL)
 	PHP_FE_END	/* Must be the last line in zxf_functions[] */
 };
 /* }}} */
