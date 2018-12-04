@@ -32,4 +32,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/svn/php-7.2.2/ext/zxf/modules'
+libdir='/home/svn/zxf/modules'

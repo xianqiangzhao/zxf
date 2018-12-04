@@ -147,8 +147,7 @@ PHP_FUNCTION(zxf_get_arr)
   	zval z;
     array_init(&z);
  	add_assoc_string(&z, "key", "value01");
- 	Z_ADDREF_P(&z);
-  	RETVAL_ARR(Z_ARRVAL(z));
+   	RETURN_ARR(Z_ARR(z));
 }
 /* }}} */
 
