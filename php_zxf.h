@@ -20,7 +20,8 @@
 
 #ifndef PHP_ZXF_H
 #define PHP_ZXF_H
-
+#include "zend_smart_str.h"
+ 
 extern zend_module_entry zxf_module_entry;
 #define phpext_zxf_ptr &zxf_module_entry
 
@@ -37,7 +38,7 @@ extern zend_module_entry zxf_module_entry;
 #ifdef ZTS
 #include "TSRM.h"
 #endif
-
+#include "ext/json/php_json.h"
  
 ZEND_BEGIN_MODULE_GLOBALS(zxf)
 	zend_long  global_value;

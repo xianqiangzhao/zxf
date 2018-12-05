@@ -26,7 +26,8 @@
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "php_zxf.h"
-#include "zend_smart_str.h"
+
+
 ZEND_DECLARE_MODULE_GLOBALS(zxf)
 
 
@@ -171,11 +172,79 @@ PHP_FUNCTION(zxf_smart_str)
 	zend_string *ret;
 	smart_str_appendl(&buf, "zhaoxianqiang", strlen("zhaoxianqiang"));
     
-    //printf("%s\n", buf.s->val);
     ret = zend_string_init(buf.s->val, buf.a, 0);
     smart_str_free(&buf);
  	RETURN_STR(ret);
 }
+
+/* {{{zxf_php_json_encode
+*/
+PHP_FUNCTION(zxf_php_json_encode)
+{
+	zval *parameter;
+ 	smart_str buf = {0};
+	zend_long options = 0;
+ 	ZEND_PARSE_PARAMETERS_START(1, 3)
+		Z_PARAM_ZVAL(parameter)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_LONG(options)
+ 	ZEND_PARSE_PARAMETERS_END();
+
+	php_json_encode(&buf, parameter, options);
+	smart_str_0(&buf);
+	if (buf.s) {
+		RETURN_NEW_STR(buf.s);
+	}
+	RETURN_EMPTY_STRING();
+
+}
+/* {{{zxf_php_json_decode
+*/
+PHP_FUNCTION(zxf_php_json_decode)
+{
+	char *str;
+	size_t str_len;
+	zend_bool assoc = 0;  
+	zend_bool assoc_null = 1;
+	zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH;
+	zend_long options = 0;
+
+	ZEND_PARSE_PARAMETERS_START(1, 4)
+		Z_PARAM_STRING(str, str_len)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_BOOL_EX(assoc, assoc_null, 1, 0)
+		Z_PARAM_LONG(depth)
+		Z_PARAM_LONG(options)
+	ZEND_PARSE_PARAMETERS_END();
+	if (!str_len) {
+		JSON_G(error_code) = PHP_JSON_ERROR_SYNTAX;
+		RETURN_NULL();
+	}
+
+	if (depth <= 0) {
+		php_error_docref(NULL, E_WARNING, "Depth must be greater than zero");
+		RETURN_NULL();
+	}
+
+	if (depth > INT_MAX) {
+		php_error_docref(NULL, E_WARNING, "Depth must be lower than %d", INT_MAX);
+		RETURN_NULL();
+	}
+
+	/* For BC reasons, the bool $assoc overrides the long $options bit for PHP_JSON_OBJECT_AS_ARRAY */
+	if (!assoc_null) {
+		if (assoc) {
+			options |=  PHP_JSON_OBJECT_AS_ARRAY;
+		} else {
+			options &= ~PHP_JSON_OBJECT_AS_ARRAY;
+		}
+	}
+ 	php_json_decode(return_value, str, str_len, options, depth);
+ 
+}
+
+
+
 /* {{{ php_zxf_init_globals
  */
 /* Uncomment this function if you have INI entries
@@ -253,6 +322,8 @@ const zend_function_entry zxf_functions[] = {
 	PHP_FE(zxf_get_arr, NULL)
 	PHP_FE(zxf_test, NULL)
 	PHP_FE(zxf_smart_str, NULL)
+	PHP_FE(zxf_php_json_encode, NULL)
+    PHP_FE(zxf_php_json_decode, NULL)
 	PHP_FE_END	/* Must be the last line in zxf_functions[] */
 };
 /* }}} */
