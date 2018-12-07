@@ -148,7 +148,30 @@ PHP_FUNCTION(zxf_get_arr)
   	zval z;
     array_init(&z);
  	add_assoc_string(&z, "key", "value01");
+ 	add_next_index_string(&z, "value02");
+ 	add_next_index_string(&z, "value03");
+ 	add_next_index_string(&z, "value04");
+ 	add_next_index_string(&z, "value05");
+
    	RETURN_ARR(Z_ARR(z));
+}
+/* }}} */
+
+/* {{{zxf_find_arr
+*/
+PHP_FUNCTION(zxf_find_arr)
+{
+  	zval *z;
+  	if (zend_parse_parameters(ZEND_NUM_ARGS(), "a", &z) == FAILURE) {
+		return;
+	}
+ 	zval *find = zend_hash_str_find(Z_ARR_P(z), ZEND_STRL("key"));
+ 	if (find) {
+ 	  RETURN_ZVAL(find, 0, NULL);
+ 	} else {
+ 	 RETURN_FALSE;
+ 	}
+   	
 }
 /* }}} */
 
@@ -324,6 +347,7 @@ const zend_function_entry zxf_functions[] = {
 	PHP_FE(zxf_smart_str, NULL)
 	PHP_FE(zxf_php_json_encode, NULL)
     PHP_FE(zxf_php_json_decode, NULL)
+    PHP_FE(zxf_find_arr, NULL)
 	PHP_FE_END	/* Must be the last line in zxf_functions[] */
 };
 /* }}} */
