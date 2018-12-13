@@ -162,10 +162,15 @@ PHP_FUNCTION(zxf_get_arr)
 PHP_FUNCTION(zxf_find_arr)
 {
   	zval *z;
-  	if (zend_parse_parameters(ZEND_NUM_ARGS(), "a", &z) == FAILURE) {
+  	char *s = NULL;
+  	size_t len;
+  	if (zend_parse_parameters(ZEND_NUM_ARGS(), "as", &z, &s, &len) == FAILURE) {
 		return;
 	}
- 	zval *find = zend_hash_str_find(Z_ARR_P(z), ZEND_STRL("key"));
+	if (!s) {
+		RETURN_FALSE;
+	}
+ 	zval *find = zend_hash_str_find(Z_ARR_P(z), s, len);
  	if (find) {
  	  RETURN_ZVAL(find, 0, NULL);
  	} else {
@@ -192,11 +197,14 @@ PHP_FUNCTION(zxf_test)
 PHP_FUNCTION(zxf_smart_str)
 {
 	smart_str buf = {0};
-	zend_string *ret;
-	smart_str_appendl(&buf, "zhaoxianqiang", strlen("zhaoxianqiang"));
-    
-    ret = zend_string_init(buf.s->val, buf.a, 0);
-    smart_str_free(&buf);
+	zend_string *ret, *s;
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_STR(s)
+	ZEND_PARSE_PARAMETERS_END();
+	smart_str_appendl(&buf, ZSTR_VAL(s), ZSTR_LEN(s));
+	smart_str_appendl(&buf, "zxq", 3);
+	ret = zend_string_init(buf.s->val,buf.s->len, 0);
+	smart_str_free(&buf);
  	RETURN_STR(ret);
 }
 
