@@ -39,12 +39,41 @@ extern zend_module_entry zxf_module_entry;
 #include "TSRM.h"
 #endif
 #include "ext/json/php_json.h"
- 
+#include "php_wrapper.h"
+
 ZEND_BEGIN_MODULE_GLOBALS(zxf)
 	zend_long  global_value;
 	char *global_string;
 ZEND_END_MODULE_GLOBALS(zxf)
 
+
+enum Bool_type
+{
+    ZXF_TRUE = 1,
+    ZXF_FALSE = 0,
+};
+
+/**
+check is callable
+*/
+static inline int php_zxf_is_callable(zval *callback TSRMLS_DC)
+{
+    if (!callback || ZVAL_IS_NULL(callback))
+    {
+    }
+    char *func_name = NULL;
+    if (!zxf_zend_is_callable(callback, 0, &func_name TSRMLS_CC))
+    {
+        php_error_docref(NULL, E_WARNING, "Function '%s' is not callable", func_name);
+        efree(func_name);
+        return ZXF_FALSE;
+    }
+    else
+    {
+        efree(func_name);
+        return ZXF_TRUE;
+    }
+}
 
 /* Always refer to the globals in your function as ZXF_G(variable).
    You are encouraged to rename these macros something shorter, see

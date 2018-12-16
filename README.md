@@ -12,3 +12,6 @@
 
 5.smart string 字符串返回
 	zxf_smart_str
+6.zxf_call_param 调用任意函数，第一个参数是函数名，第二以后是需要的参数
+	$a = zxf_call_param("array_merge", ['key01'=>01], ['key02'=>02]);
+	var_dump($a);
