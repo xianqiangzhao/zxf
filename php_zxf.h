@@ -45,6 +45,15 @@ ZEND_BEGIN_MODULE_GLOBALS(zxf)
 	char *global_string;
 ZEND_END_MODULE_GLOBALS(zxf)
 
+#if !defined(__GNUC__) || __GNUC__ < 3
+#define __builtin_expect(x, expected_value) (x)
+#endif
+#ifndef likely
+#define likely(x)        __builtin_expect(!!(x), 1)
+#endif
+#ifndef unlikely
+#define unlikely(x)      __builtin_expect(!!(x), 0)
+#endif
 
 enum Bool_type
 {
@@ -52,11 +61,9 @@ enum Bool_type
     ZXF_FALSE = 0,
 };
 
-static inline int zxf_call_user_function_ex(HashTable *function_table, zval* object_p, zval *function_name, zval **retval_ptr_ptr, uint32_t param_count, zval *params, int no_separation, HashTable* ymbol_table)
+static inline int zxf_call_user_function_ex(HashTable *function_table, zval* object_p, zval *function_name, zval *retval_ptr_ptr, uint32_t param_count, zval *params, int no_separation, HashTable* ymbol_table)
 {
-    static zval _retval;
-    *retval_ptr_ptr = &_retval;
-    return call_user_function_ex(function_table, object_p, function_name, &_retval, param_count, param_count ? params : NULL, no_separation, ymbol_table);
+    return call_user_function_ex(function_table, object_p, function_name, retval_ptr_ptr, param_count, param_count ? params : NULL, no_separation, ymbol_table);
 }
 
 static inline int zxf_call_user_function_fast_ex(zval *function_name, zend_fcall_info_cache *fci_cache, zval *retval, uint32_t param_count, zval *params)

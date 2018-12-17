@@ -34,7 +34,7 @@ ZEND_DECLARE_MODULE_GLOBALS(zxf)
 /* True global resources - no need for thread safety here */
 static int le_zxf;
 
-/* {{{ PHP_INI
+/*      PHP_INI
  */
 PHP_INI_BEGIN()
 STD_PHP_INI_ENTRY("zxf.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_zxf_globals, zxf_globals)
@@ -44,8 +44,8 @@ PHP_INI_END()
 /* }}} */
 
 ZEND_BEGIN_ARG_INFO_EX(zxf_call_param_yaf_arginfo, 0, 0, 2)
-	ZEND_ARG_INFO(0, entry)
-	ZEND_ARG_INFO(0, ...)
+ZEND_ARG_INFO(0, entry)
+ZEND_ARG_INFO(0, ...)
 ZEND_END_ARG_INFO()
 
 /* Remove the following function when you have successfully modified config.m4
@@ -53,7 +53,7 @@ ZEND_END_ARG_INFO()
    purposes. */
 
 /* Every user-visible function in PHP should document itself in the source */
-/* {{{ proto string confirm_zxf_compiled(string arg)
+/*      proto string confirm_zxf_compiled(string arg)
    Return a string to confirm that the module is compiled in */
 PHP_FUNCTION(confirm_zxf_compiled)
 {
@@ -72,7 +72,7 @@ PHP_FUNCTION(confirm_zxf_compiled)
 }
 /* }}} */
 
-/* {{{zxf_echo
+/*     zxf_echo
 */
 PHP_FUNCTION(zxf_echo)
 {
@@ -94,7 +94,7 @@ PHP_FUNCTION(zxf_echo)
 
 /* }}} */
 
-/* {{{zxf_get_type
+/*     zxf_get_type
 */
 PHP_FUNCTION(zxf_get_type)
 {
@@ -150,7 +150,7 @@ PHP_FUNCTION(zxf_get_type)
 /* }}} */
 
 
-/* {{{zxf_get_arr
+/*     zxf_get_arr
 */
 PHP_FUNCTION(zxf_get_arr)
 {
@@ -178,7 +178,7 @@ PHP_FUNCTION(zxf_get_arr)
 }
 /* }}} */
 
-/* {{{zxf_find_arr
+/*     zxf_find_arr
 */
 PHP_FUNCTION(zxf_find_arr)
 {
@@ -206,7 +206,7 @@ PHP_FUNCTION(zxf_find_arr)
 }
 /* }}} */
 
-/* {{{zxf_test
+/*     zxf_test
 */
 PHP_FUNCTION(zxf_test)
 {
@@ -223,7 +223,7 @@ PHP_FUNCTION(zxf_test)
     RETURN_ARR(Z_ARR_P(z));
 }
 
-/* {{{zxf_smart_str
+/*     zxf_smart_str
 */
 PHP_FUNCTION(zxf_smart_str)
 {
@@ -238,7 +238,7 @@ PHP_FUNCTION(zxf_smart_str)
     RETURN_NEW_STR(buf.s);
 }
 
-/* {{{zxf_php_json_encode
+/*     zxf_php_json_encode
 */
 PHP_FUNCTION(zxf_php_json_encode)
 {
@@ -263,7 +263,7 @@ PHP_FUNCTION(zxf_php_json_encode)
 
 
 
-/* {{{zxf_call  No paramter
+/*     zxf_call  No paramter
 */
 PHP_FUNCTION(zxf_call)
 {
@@ -291,7 +291,7 @@ PHP_FUNCTION(zxf_call)
 }
 
 
-/* {{{zxf_call parameter ok
+/*     zxf_call parameter ok
 */
 PHP_FUNCTION(zxf_call_param)
 {
@@ -303,6 +303,7 @@ PHP_FUNCTION(zxf_call_param)
     {
         RETURN_FALSE;
     }
+    //first param is callback function
     if (ZEND_NUM_ARGS() > 0)
     {
         callback = &args[0];
@@ -317,7 +318,7 @@ PHP_FUNCTION(zxf_call_param)
         {
             php_error_docref(NULL, E_WARNING, "call function failure");
         }
-        if (Z_TYPE(retval) != IS_UNDEF)
+        if (likely(Z_TYPE(retval) != IS_UNDEF))
         {
             RETURN_ZVAL(&retval, 0, NULL);
         }
@@ -330,7 +331,7 @@ PHP_FUNCTION(zxf_call_param)
 }
 
 
-/* {{{zxf_call parameter copy from yaf
+/*     zxf_call parameter copy from yaf
 */
 PHP_FUNCTION(zxf_call_param_yaf)
 {
@@ -347,7 +348,7 @@ PHP_FUNCTION(zxf_call_param_yaf)
     if (zend_call_function(&fci, &fci_cache) == SUCCESS && Z_TYPE(retval) != IS_UNDEF)
     {
         //ZVAL_COPY_VALUE(return_value, &retval);
-         RETURN_ZVAL(&retval, 0, NULL);
+        RETURN_ZVAL(&retval, 0, NULL);
     }
     else
     {
@@ -355,7 +356,7 @@ PHP_FUNCTION(zxf_call_param_yaf)
     }
 }
 
-/* {{{zxf_php_json_decode
+/*     zxf_php_json_decode
 */
 PHP_FUNCTION(zxf_php_json_decode)
 {
@@ -407,9 +408,50 @@ PHP_FUNCTION(zxf_php_json_decode)
 
 }
 
+/*     set_process_name
+*/
+PHP_FUNCTION(set_process_name)
+{
 
+    zval *name;
+    long size = 128;
 
-/* {{{ php_zxf_init_globals
+    if (zend_parse_parameters(ZEND_NUM_ARGS(), "z|l", &name, &size) == FAILURE)
+    {
+        RETURN_FALSE;
+    }
+
+    if (Z_STRLEN_P(name) == 0)
+    {
+        return;
+    }
+    else if (Z_STRLEN_P(name) > 127)
+    {
+        php_error_docref(NULL, E_WARNING, "process name is too long, the max length is 127");
+    }
+    zval retval;
+    zval args[1];
+    args[0] = *name;
+
+    zval  function;
+    ZVAL_STRING(&function, "cli_set_process_title");
+
+    if (zxf_call_user_function_ex(EG(function_table), NULL, &function, &retval, 1, args, 0, NULL) == FAILURE)
+    {
+        return;
+    }
+    if (UNEXPECTED(EG(exception)))
+    {
+        zend_exception_error(EG(exception), E_ERROR);
+    }
+    zval_ptr_dtor(&function);
+    if (Z_TYPE(retval) != IS_UNDEF)
+    {
+        zval_ptr_dtor(&retval);
+    }
+}
+
+/*      php_zxf_init_globals
  */
 /* Uncomment this function if you have INI entries
 static void php_zxf_init_globals(zend_zxf_globals *zxf_globals)
@@ -420,7 +462,7 @@ static void php_zxf_init_globals(zend_zxf_globals *zxf_globals)
 */
 /* }}} */
 
-/* {{{ PHP_MINIT_FUNCTION
+/*      PHP_MINIT_FUNCTION
  */
 PHP_MINIT_FUNCTION(zxf)
 {
@@ -432,7 +474,7 @@ PHP_MINIT_FUNCTION(zxf)
 }
 /* }}} */
 
-/* {{{ PHP_MSHUTDOWN_FUNCTION
+/*      PHP_MSHUTDOWN_FUNCTION
  */
 PHP_MSHUTDOWN_FUNCTION(zxf)
 {
@@ -442,7 +484,7 @@ PHP_MSHUTDOWN_FUNCTION(zxf)
 /* }}} */
 
 /* Remove if there's nothing to do at request start */
-/* {{{ PHP_RINIT_FUNCTION
+/*      PHP_RINIT_FUNCTION
  */
 PHP_RINIT_FUNCTION(zxf)
 {
@@ -454,7 +496,7 @@ PHP_RINIT_FUNCTION(zxf)
 /* }}} */
 
 /* Remove if there's nothing to do at request end */
-/* {{{ PHP_RSHUTDOWN_FUNCTION
+/*      PHP_RSHUTDOWN_FUNCTION
  */
 PHP_RSHUTDOWN_FUNCTION(zxf)
 {
@@ -462,7 +504,7 @@ PHP_RSHUTDOWN_FUNCTION(zxf)
 }
 /* }}} */
 
-/* {{{ PHP_MINFO_FUNCTION
+/*      PHP_MINFO_FUNCTION
  */
 PHP_MINFO_FUNCTION(zxf)
 {
@@ -475,7 +517,7 @@ PHP_MINFO_FUNCTION(zxf)
 }
 /* }}} */
 
-/* {{{ zxf_functions[]
+/*      zxf_functions[]
  *
  * Every user visible function must have an entry in zxf_functions[].
  */
@@ -493,11 +535,12 @@ const zend_function_entry zxf_functions[] =
     PHP_FE(zxf_call, NULL)
     PHP_FE(zxf_call_param, NULL)
     PHP_FE(zxf_call_param_yaf, zxf_call_param_yaf_arginfo)
+    PHP_FE(set_process_name, NULL)
     PHP_FE_END    /* Must be the last line in zxf_functions[] */
 };
 /* }}} */
 
-/* {{{ zxf_module_entry
+/*      zxf_module_entry
  */
 zend_module_entry zxf_module_entry =
 {
