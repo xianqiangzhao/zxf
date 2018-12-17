@@ -39,7 +39,6 @@ extern zend_module_entry zxf_module_entry;
 #include "TSRM.h"
 #endif
 #include "ext/json/php_json.h"
-#include "php_wrapper.h"
 
 ZEND_BEGIN_MODULE_GLOBALS(zxf)
 	zend_long  global_value;
@@ -52,6 +51,49 @@ enum Bool_type
     ZXF_TRUE = 1,
     ZXF_FALSE = 0,
 };
+
+static inline int zxf_call_user_function_ex(HashTable *function_table, zval* object_p, zval *function_name, zval **retval_ptr_ptr, uint32_t param_count, zval *params, int no_separation, HashTable* ymbol_table)
+{
+    static zval _retval;
+    *retval_ptr_ptr = &_retval;
+    return call_user_function_ex(function_table, object_p, function_name, &_retval, param_count, param_count ? params : NULL, no_separation, ymbol_table);
+}
+
+static inline int zxf_call_user_function_fast_ex(zval *function_name, zend_fcall_info_cache *fci_cache, zval *retval, uint32_t param_count, zval *params)
+{
+    zend_fcall_info fci;
+    ZEND_ASSERT(retval);
+    fci.size = sizeof(fci);
+#if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION == 0
+    fci.function_table = EG(function_table);
+    fci.symbol_table = NULL;
+#endif
+    fci.object = NULL;
+    if (!fci_cache || !fci_cache->function_handler)
+    {
+        ZVAL_COPY_VALUE(&fci.function_name, function_name);
+    }
+    else
+    {
+        ZVAL_UNDEF(&fci.function_name);
+    }
+    fci.retval = retval;
+    fci.param_count = param_count;
+    fci.params = params;
+    fci.no_separation = 0;
+
+    return zend_call_function(&fci, fci_cache);
+}
+
+static inline int zxf_zend_is_callable(zval *cb, int a, char **name)
+{
+    zend_string *key = NULL;
+    int ret = zend_is_callable(cb, a, &key);
+    char *tmp = estrndup(key->val, key->len);
+    zend_string_release(key);
+    *name = tmp;
+    return ret;
+}
 
 /**
 check is callable
