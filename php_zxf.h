@@ -21,18 +21,18 @@
 #ifndef PHP_ZXF_H
 #define PHP_ZXF_H
 #include "zend_smart_str.h"
- 
+
 extern zend_module_entry zxf_module_entry;
 #define phpext_zxf_ptr &zxf_module_entry
 
 #define PHP_ZXF_VERSION "0.1.0" /* Replace with version number for your extension */
 
 #ifdef PHP_WIN32
-#	define PHP_ZXF_API __declspec(dllexport)
+# define PHP_ZXF_API __declspec(dllexport)
 #elif defined(__GNUC__) && __GNUC__ >= 4
-#	define PHP_ZXF_API __attribute__ ((visibility("default")))
+# define PHP_ZXF_API __attribute__ ((visibility("default")))
 #else
-#	define PHP_ZXF_API
+# define PHP_ZXF_API
 #endif
 
 #ifdef ZTS
@@ -41,8 +41,8 @@ extern zend_module_entry zxf_module_entry;
 #include "ext/json/php_json.h"
 
 ZEND_BEGIN_MODULE_GLOBALS(zxf)
-	zend_long  global_value;
-	char *global_string;
+zend_long  global_value;
+char *global_string;
 ZEND_END_MODULE_GLOBALS(zxf)
 
 #if !defined(__GNUC__) || __GNUC__ < 3
@@ -61,7 +61,7 @@ enum Bool_type
     ZXF_FALSE = 0,
 };
 
-static inline int zxf_call_user_function_ex(HashTable *function_table, zval* object_p, zval *function_name, zval *retval_ptr_ptr, uint32_t param_count, zval *params, int no_separation, HashTable* ymbol_table)
+static inline int zxf_call_user_function_ex(HashTable *function_table, zval *object_p, zval *function_name, zval *retval_ptr_ptr, uint32_t param_count, zval *params, int no_separation, HashTable *ymbol_table)
 {
     return call_user_function_ex(function_table, object_p, function_name, retval_ptr_ptr, param_count, param_count ? params : NULL, no_separation, ymbol_table);
 }
@@ -129,12 +129,12 @@ static inline int php_zxf_is_callable(zval *callback TSRMLS_DC)
    examples in any other php module directory.
 */
 #define ZXF_G(v) ZEND_MODULE_GLOBALS_ACCESSOR(zxf, v)
- 
+
 #if defined(ZTS) && defined(COMPILE_DL_ZXF)
 ZEND_TSRMLS_CACHE_EXTERN()
 #endif
 
-#endif	/* PHP_ZXF_H */
+#endif  /* PHP_ZXF_H */
 
 
 /*

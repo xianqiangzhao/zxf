@@ -408,7 +408,7 @@ PHP_FUNCTION(zxf_php_json_decode)
 
 }
 
-/*     set_process_name
+/* set_process_name
 */
 PHP_FUNCTION(set_process_name)
 {
