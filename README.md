@@ -1,4 +1,6 @@
-# zxf
+# zxf php 扩展
+
+ 包含的函数
 
 1.原值返回函数
   zxf_echo($param);
@@ -16,7 +18,8 @@
     $a = zxf_call_param("array_merge", ['key01'=>01], ['key02'=>02]);
     var_dump($a);
 
-
 7.zxf_call_param_yaf 调用任意函数的另一个版本
     $a = zxf_call_param_yaf("array_merge", ['key01'=>01], ['key02'=>02]);
     var_dump($a);
+
+8.zxf_server 开启服务类(作业中)

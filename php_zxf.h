@@ -55,6 +55,14 @@ ZEND_END_MODULE_GLOBALS(zxf)
 #define unlikely(x)      __builtin_expect(!!(x), 0)
 #endif
 
+#define ZXF_STARTUP(module)         ZEND_MODULE_STARTUP_N(zxf_##module)(INIT_FUNC_ARGS_PASSTHRU)
+#define ZXF_STARTUP_FUNCTION(module)    ZEND_MINIT_FUNCTION(zxf_##module)
+#define ZXF_RINIT_FUNCTION(module)    ZEND_RINIT_FUNCTION(zxf_##module)
+#define ZXF_SHUTDOWN(module)        ZEND_MODULE_SHUTDOWN_N(zxf_##module)(INIT_FUNC_ARGS_PASSTHRU)
+#define ZXF_SHUTDOWN_FUNCTION(module)   ZEND_MSHUTDOWN_FUNCTION(zxf_##module)
+
+extern zend_class_entry *zxf_server_ce;
+
 enum Bool_type
 {
     ZXF_TRUE = 1,
@@ -109,6 +117,7 @@ static inline int php_zxf_is_callable(zval *callback TSRMLS_DC)
 {
     if (!callback || ZVAL_IS_NULL(callback))
     {
+        return ZXF_FALSE;
     }
     char *func_name = NULL;
     if (!zxf_zend_is_callable(callback, 0, &func_name TSRMLS_CC))

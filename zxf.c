@@ -34,23 +34,21 @@ ZEND_DECLARE_MODULE_GLOBALS(zxf)
 /* True global resources - no need for thread safety here */
 static int le_zxf;
 
-/*      PHP_INI
+/* PHP_INI
  */
 PHP_INI_BEGIN()
 STD_PHP_INI_ENTRY("zxf.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_zxf_globals, zxf_globals)
 STD_PHP_INI_ENTRY("zxf.global_string", "foobar", PHP_INI_ALL, OnUpdateString, global_string, zend_zxf_globals, zxf_globals)
 PHP_INI_END()
 
-/* }}} */
+
 
 ZEND_BEGIN_ARG_INFO_EX(zxf_call_param_yaf_arginfo, 0, 0, 2)
 ZEND_ARG_INFO(0, entry)
 ZEND_ARG_INFO(0, ...)
 ZEND_END_ARG_INFO()
 
-/* Remove the following function when you have successfully modified config.m4
-   so that your module can be compiled into PHP, it exists only for testing
-   purposes. */
+
 
 /* Every user-visible function in PHP should document itself in the source */
 /*      proto string confirm_zxf_compiled(string arg)
@@ -70,9 +68,8 @@ PHP_FUNCTION(confirm_zxf_compiled)
 
     RETURN_STR(strg);
 }
-/* }}} */
 
-/*     zxf_echo
+/* zxf_echo
 */
 PHP_FUNCTION(zxf_echo)
 {
@@ -91,10 +88,7 @@ PHP_FUNCTION(zxf_echo)
     RETURN_ZVAL(z, 0, NULL);
 }
 
-
-/* }}} */
-
-/*     zxf_get_type
+/* zxf_get_type
 */
 PHP_FUNCTION(zxf_get_type)
 {
@@ -147,10 +141,8 @@ PHP_FUNCTION(zxf_get_type)
     }
     RETURN_STR(ret);
 }
-/* }}} */
 
-
-/*     zxf_get_arr
+/* zxf_get_arr
 */
 PHP_FUNCTION(zxf_get_arr)
 {
@@ -176,9 +168,9 @@ PHP_FUNCTION(zxf_get_arr)
     zend_hash_str_update(Z_ARR(z), "key01", strlen("key01"), &new);
     RETURN_ARR(Z_ARR(z));
 }
-/* }}} */
 
-/*     zxf_find_arr
+
+/* zxf_find_arr
 */
 PHP_FUNCTION(zxf_find_arr)
 {
@@ -204,9 +196,9 @@ PHP_FUNCTION(zxf_find_arr)
     }
 
 }
-/* }}} */
 
-/*     zxf_test
+
+/* zxf_test
 */
 PHP_FUNCTION(zxf_test)
 {
@@ -223,7 +215,7 @@ PHP_FUNCTION(zxf_test)
     RETURN_ARR(Z_ARR_P(z));
 }
 
-/*     zxf_smart_str
+/* zxf_smart_str
 */
 PHP_FUNCTION(zxf_smart_str)
 {
@@ -238,7 +230,7 @@ PHP_FUNCTION(zxf_smart_str)
     RETURN_NEW_STR(buf.s);
 }
 
-/*     zxf_php_json_encode
+/* zxf_php_json_encode
 */
 PHP_FUNCTION(zxf_php_json_encode)
 {
@@ -250,7 +242,6 @@ PHP_FUNCTION(zxf_php_json_encode)
     Z_PARAM_OPTIONAL
     Z_PARAM_LONG(options)
     ZEND_PARSE_PARAMETERS_END();
-
     php_json_encode(&buf, parameter, options);
     smart_str_0(&buf);
     if (buf.s)
@@ -263,7 +254,7 @@ PHP_FUNCTION(zxf_php_json_encode)
 
 
 
-/*     zxf_call  No paramter
+/* zxf_call  No paramter
 */
 PHP_FUNCTION(zxf_call)
 {
@@ -291,7 +282,7 @@ PHP_FUNCTION(zxf_call)
 }
 
 
-/*     zxf_call parameter ok
+/* zxf_call parameter ok
 */
 PHP_FUNCTION(zxf_call_param)
 {
@@ -327,18 +318,16 @@ PHP_FUNCTION(zxf_call_param)
     {
         RETURN_FALSE;
     }
-
 }
 
 
-/*     zxf_call parameter copy from yaf
+/* zxf_call parameter copy from yaf
 */
 PHP_FUNCTION(zxf_call_param_yaf)
 {
     zval retval;
     zend_fcall_info fci;
     zend_fcall_info_cache fci_cache;
-
     if (zend_parse_parameters(ZEND_NUM_ARGS(), "f*", &fci, &fci_cache, &fci.params, &fci.param_count) == FAILURE)
     {
         return;
@@ -347,7 +336,6 @@ PHP_FUNCTION(zxf_call_param_yaf)
 
     if (zend_call_function(&fci, &fci_cache) == SUCCESS && Z_TYPE(retval) != IS_UNDEF)
     {
-        //ZVAL_COPY_VALUE(return_value, &retval);
         RETURN_ZVAL(&retval, 0, NULL);
     }
     else
@@ -356,7 +344,7 @@ PHP_FUNCTION(zxf_call_param_yaf)
     }
 }
 
-/*     zxf_php_json_decode
+/* zxf_php_json_decode
 */
 PHP_FUNCTION(zxf_php_json_decode)
 {
@@ -366,7 +354,6 @@ PHP_FUNCTION(zxf_php_json_decode)
     zend_bool assoc_null = 1;
     zend_long depth = PHP_JSON_PARSER_DEFAULT_DEPTH;
     zend_long options = 0;
-
     ZEND_PARSE_PARAMETERS_START(1, 4)
     Z_PARAM_STRING(str, str_len)
     Z_PARAM_OPTIONAL
@@ -391,8 +378,6 @@ PHP_FUNCTION(zxf_php_json_decode)
         php_error_docref(NULL, E_WARNING, "Depth must be lower than %d", INT_MAX);
         RETURN_NULL();
     }
-
-    /* For BC reasons, the bool $assoc overrides the long $options bit for PHP_JSON_OBJECT_AS_ARRAY */
     if (!assoc_null)
     {
         if (assoc)
@@ -405,14 +390,12 @@ PHP_FUNCTION(zxf_php_json_decode)
         }
     }
     php_json_decode(return_value, str, str_len, options, depth);
-
 }
 
 /* set_process_name
 */
 PHP_FUNCTION(set_process_name)
 {
-
     zval *name;
     long size = 128;
 
@@ -469,7 +452,9 @@ PHP_MINIT_FUNCTION(zxf)
 
     REGISTER_INI_ENTRIES();
     REGISTER_STRINGL_CONSTANT("ZXF_VERSION", PHP_ZXF_VERSION, sizeof(PHP_ZXF_VERSION) - 1, CONST_CS | CONST_PERSISTENT);
-
+    /* startup components */
+    ZXF_STARTUP(server);
+    //ZXF_STARTUP(client);
     return SUCCESS;
 }
 /* }}} */
