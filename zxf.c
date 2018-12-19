@@ -434,6 +434,54 @@ PHP_FUNCTION(set_process_name)
     }
 }
 
+
+/** get local ip
+*/
+PHP_FUNCTION(zxf_get_local_ip)
+{
+    struct sockaddr_in *s4;
+    struct ifaddrs *ipaddrs, *ifa;
+    void *in_addr;
+    char ip[64];
+
+    if (getifaddrs(&ipaddrs) != 0)
+    {
+        php_error_docref(NULL, E_WARNING, "getifaddrs() failed. Error: %s[%d]", strerror(errno), errno);
+        RETURN_FALSE;
+    }
+    array_init(return_value);
+    for (ifa = ipaddrs; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr == NULL || !(ifa->ifa_flags & IFF_UP))
+        {
+            continue;
+        }
+
+        switch (ifa->ifa_addr->sa_family)
+        {
+            case AF_INET:
+                s4 = (struct sockaddr_in *)ifa->ifa_addr;
+                in_addr = &s4->sin_addr;
+                break;
+            default:
+                continue;
+        }
+        if (!inet_ntop(ifa->ifa_addr->sa_family, in_addr, ip, sizeof(ip)))
+        {
+            php_error_docref(NULL, E_WARNING, "%s: inet_ntop failed.", ifa->ifa_name);
+        }
+        else
+        {
+            if (strcmp(ip, "127.0.0.1") == 0)
+            {
+                continue;
+            }
+            add_assoc_string(return_value, ifa->ifa_name, ip);
+        }
+    }
+    freeifaddrs(ipaddrs);
+}
+
 /*      php_zxf_init_globals
  */
 /* Uncomment this function if you have INI entries
@@ -521,6 +569,7 @@ const zend_function_entry zxf_functions[] =
     PHP_FE(zxf_call_param, NULL)
     PHP_FE(zxf_call_param_yaf, zxf_call_param_yaf_arginfo)
     PHP_FE(set_process_name, NULL)
+    PHP_FE(zxf_get_local_ip, NULL)
     PHP_FE_END    /* Must be the last line in zxf_functions[] */
 };
 /* }}} */
