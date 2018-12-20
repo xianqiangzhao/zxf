@@ -21,6 +21,9 @@
 #ifndef PHP_ZXF_H
 #define PHP_ZXF_H
 #include "zend_smart_str.h"
+#include "Zend/zend_exceptions.h"
+
+#include "include/zxf.h"
 
 extern zend_module_entry zxf_module_entry;
 #define phpext_zxf_ptr &zxf_module_entry
