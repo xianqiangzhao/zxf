@@ -26,7 +26,11 @@
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "php_zxf.h"
-
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <sys/ioctl.h>
 
 ZEND_DECLARE_MODULE_GLOBALS(zxf)
 
@@ -574,11 +578,21 @@ const zend_function_entry zxf_functions[] =
 };
 /* }}} */
 
-/*      zxf_module_entry
+/* zend_module_dep
+ */
+zend_module_dep zxf_deps[] = {
+    ZEND_MOD_REQUIRED("curl")
+    {NULL, NULL, NULL}
+};
+
+/* zxf_module_entry
  */
 zend_module_entry zxf_module_entry =
 {
-    STANDARD_MODULE_HEADER,
+   // STANDARD_MODULE_HEADER,
+    STANDARD_MODULE_HEADER_EX, 
+    NULL,
+    zxf_deps,
     "zxf",
     zxf_functions,
     PHP_MINIT(zxf),
