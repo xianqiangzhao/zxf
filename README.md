@@ -1,25 +1,97 @@
-# zxf php 扩展
+# zxf php extension
 
- 包含的函数
+## Function
 
-1.原值返回函数
-  zxf_echo($param);
+### zxf_echo
 
-2.取得类型
-  zxf_get_type($param);
-3.取得一个数组返回值
-  zxf_get_arr();
-4.给定数据，查找key，返回找到的值，没有找到返回false
-  zxf_find_arr($array,$key);
+(PHP7)
 
-5.smart string 字符串返回
-    echo zxf_smart_str()
-6.zxf_call_param 调用任意函数，第一个参数是函数名，第二以后是需要的参数
-    $a = zxf_call_param("array_merge", ['key01'=>01], ['key02'=>02]);
-    var_dump($a);
+zxf_echo — Original value return function
 
-7.zxf_call_param_yaf 调用任意函数的另一个版本
-    $a = zxf_call_param_yaf("array_merge", ['key01'=>01], ['key02'=>02]);
-    var_dump($a);
+Description
 
-8.zxf_server 开启服务类(作业中)
+```php
+mixed zxf_echo(mixed $var)
+```
+
+Returns the value of the PHP variable `var`.
+
+### zxf_get_type
+
+(PHP7)
+
+zxf_get_type — Get the type of a variable
+
+Description
+
+```php
+string zxf_get_type(mixed $var)
+```
+
+Returns the type of the PHP variable `var`. 
+
+### zxf_get_arr()
+
+(PHP7)
+
+zxf_get_arr — Get an array return value
+
+Description
+
+```php
+mixed zxf_get_arr(array $arr);
+```
+
+### zxf_find_arr
+
+(PHP7)
+
+zxf_find_arr — Given the data, find the key.
+
+Description
+
+```php
+zxf_find_arr(array $arr, key);
+```
+
+return the found value, not found return false.
+
+### zxf_smart_str
+
+(PHP7)
+
+zxf_smart_str —Splice string 'zxq' after the given string.
+
+Description
+
+```php
+string zxf_smart_str(string $str);
+```
+
+### zxf_call_param
+
+(PHP7)
+
+zxf_call_param — Call any function, the first parameter is the function name, the second is the required parameter.
+
+Description
+
+```php
+mixed zxf_call_param(string functinonName, ...params);
+```
+
+### zxf_call_param_yaf
+
+(PHP7)
+
+zxf_call_param_yaf — Call any function, the first parameter is the function name, the second is the required parameter.
+
+Description
+
+```php
+mixed zxf_call_param_yaf(string functinonName, ...params);
+```
+
+### zxf_server
+
+Open service class (in operation)
