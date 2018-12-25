@@ -152,11 +152,14 @@ PHP_FUNCTION(zxf_get_arr)
 {
     zval z;
     zval *pz =  NULL;
+    zval new;
+    zend_long l;
+
     ZEND_PARSE_PARAMETERS_START(1, 1)
     Z_PARAM_ZVAL(pz)
     ZEND_PARSE_PARAMETERS_END();
     array_init(&z);
-    //add  string
+    //add string
     add_assoc_string(&z, "key", "value01");
     add_next_index_string(&z, "value02");
     add_next_index_string(&z, "value03");
@@ -166,8 +169,7 @@ PHP_FUNCTION(zxf_get_arr)
     Z_ADDREF_P(pz);
     zend_hash_str_update(Z_ARR(z), "key", strlen("key"), pz);
     //add long
-    zval new;
-    zend_long l = 88888;
+    l = 88888;
     ZVAL_LONG(&new, l);
     zend_hash_str_update(Z_ARR(z), "key01", strlen("key01"), &new);
     RETURN_ARR(Z_ARR(z));
@@ -198,7 +200,6 @@ PHP_FUNCTION(zxf_find_arr)
     {
         RETURN_FALSE;
     }
-
 }
 
 
